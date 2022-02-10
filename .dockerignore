@@ -1,0 +1,6 @@
+/docker-compose
+/node_modules
+Makefile
+README.md
+.env
+.env.schema
