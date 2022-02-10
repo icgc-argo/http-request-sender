@@ -2,7 +2,7 @@
 
 This is a simple NodeJS script that will send a single HTTP request based on a the provided environment variables.
 
-The purpose is to build a Docker image that can be run as a Kubernetes or CronJob to send scheduled web requests from within a cluster. This could be used to insert messages into a queue or to trigger an API request on another service.
+The purpose is to build a Docker image that can be run as a Kubernetes CronJob to send scheduled web requests from within a cluster. This could be used to insert messages into a queue or to trigger an API request on another service.
 
 There are no build processes or tests included, at the moment. The script is short and sweet.
 
