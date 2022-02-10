@@ -78,7 +78,7 @@ spec:
 
     stage('Build Docker') {
       when {
-        branch "master"
+        branch "main"
       }
       steps {
         container('docker') {
