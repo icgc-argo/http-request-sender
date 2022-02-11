@@ -83,10 +83,29 @@ spec:
       }
       steps {
         container('docker') {
+          sh "docker build --network=host -f Dockerfile . -t ${dockerRegistry}/${githubRepo}:${commit}"
+        }
+      }
+    }
+
+    stage('Tag Github Repo') {
+      when {
+        branch "main"
+      }
+      steps {
           withCredentials([usernamePassword(credentialsId: 'argoGithub', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
             sh "git tag ${version}"
             sh('git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/icgc-argo/http-request-sender --tags')
           }
+      }
+    }
+    stage('Push Docker Image') {
+      when {
+        branch "main"
+      }
+      steps {
+        container('docker') {
+
           withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
             sh('docker login ghcr.io -u $USERNAME -p $PASSWORD')
           }
