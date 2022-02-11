@@ -88,7 +88,7 @@ spec:
             sh('git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/icgc-argo/http-request-sender --tags')
           }
           withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-            sh('docker login $dockerRegistry -u $USERNAME -p $PASSWORD')
+            sh('docker login ghcr.io -u $USERNAME -p $PASSWORD')
           }
           sh "docker tag ${dockerRegistry}/${githubRepo}:${commit} ${dockerRegistry}/${githubRepo}:${version}"
           sh "docker tag ${dockerRegistry}/${githubRepo}:${commit} ${dockerRegistry}/${githubRepo}:latest"
