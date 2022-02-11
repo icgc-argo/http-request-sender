@@ -19,8 +19,9 @@
 
 def commit = "UNKNOWN"
 def version = "UNKNOWN"
+def dockerRegistry = "ghcr.io"
 def serviceName = "http-request-sender"
-def dockerRepo = "icgcargo/${serviceName}"
+def githubRepo = "icgc-argo/${serviceName}"
 def repoName = "icgc-argo"
 
 pipeline {
@@ -65,7 +66,7 @@ spec:
 
   stages {
 
-    stage('Checkout Code') {
+    stage('Prepare') {
       steps {
           script {
               commit = sh(returnStdout: true, script: 'git describe --always').trim()
@@ -84,14 +85,15 @@ spec:
         container('docker') {
           withCredentials([usernamePassword(credentialsId: 'argoGithub', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
             sh "git tag ${version}"
-            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${repoName}/${serviceName} --tags"
+            sh('git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/$githubRepo --tags')
           }
-          withCredentials([usernamePassword(credentialsId:'argoDockerHub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-            sh 'docker login -u $USERNAME -p $PASSWORD'
+          withCredentials([usernamePassword(credentialsId:'argoContainers', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            sh('docker login $dockerRegistry -u $USERNAME -p $PASSWORD')
           }
-          sh "docker  build --build-arg COMMIT_ID=${commit} --build-arg VERSION=${version} --network=host -f Dockerfile . -t ${dockerRepo}:latest -t ${dockerRepo}:${version}"
-          sh "docker push ${dockerRepo}:${version}"
-          sh "docker push ${dockerRepo}:latest"
+          sh "docker tag ${dockerRegistry}/${githubRepo}:${commit} ${dockerRegistry}/${githubRepo}:${version}"
+          sh "docker tag ${dockerRegistry}/${githubRepo}:${commit} ${dockerRegistry}/${githubRepo}:latest"
+          sh "docker push ${dockerRegistry}/${githubRepo}:${version}"
+          sh "docker push ${dockerRegistry}/${githubRepo}:latest"
         }
       }
     }
