@@ -4,7 +4,11 @@ This is a simple NodeJS script that will send a single HTTP request based on a t
 
 The purpose is to build a Docker image that can be run as a Kubernetes CronJob to send scheduled web requests from within a cluster. This could be used to insert messages into a queue or to trigger an API request on another service.
 
-There are no build processes or tests included, at the moment. The script is short and sweet.
+## Docker Images
+Built docker images are hosted in GHCR: https://ghcr.io/icgc-argo/http-request-sender
+
+## Helm Chart
+There is no dedicated helm chart for this service, but there is a generic cron-job chart that was made for this purpose: https://github.com/icgc-argo/charts/tree/master/cron-job
 
 ## Ego Authorization
 
