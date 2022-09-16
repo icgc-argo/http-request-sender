@@ -1,6 +1,48 @@
+/*
+ * Copyright (c) 2022 The Ontario Institute for Cancer Research. All rights reserved
+ *
+ * This program and the accompanying materials are made available under the terms of
+ * the GNU Affero General Public License v3.0. You should have received a copy of the
+ * GNU Affero General Public License along with this program.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 require("dotenv").config();
 const { omit } = require("lodash");
 const axios = require("axios");
+const vault = require("./vault")
+
+async function loadVaultSecrets() {
+  const vaultEnabled = process.env.VAULT_ENABLED === 'true';
+  let secrets = {};
+
+  /** Vault */
+  if (vaultEnabled) {
+    if (process.env.VAULT_ENABLED && process.env.VAULT_ENABLED === 'true') {
+      if (!process.env.VAULT_SECRETS_PATH) {
+        console.error('Path to secrets not specified but vault is enabled');
+        throw new Error('Path to secrets not specified but vault is enabled');
+      }
+      try {
+        secrets = await vault.loadSecret(process.env.VAULT_SECRETS_PATH);
+      } catch (err) {
+        console.error('Failed to load secrets from vault.');
+        throw new Error('Failed to load secrets from vault.');
+      }
+    }
+  }
+  return secrets;
+};
 
 /**
  * Read in env variables
@@ -26,17 +68,19 @@ if (BODY) {
 
 const headers = process.env.HEADERS ? JSON.parse(process.env.HEADERS) : {};
 
-// OPTIONAL: Ego Auth Variables, used to add ego auth to the request.
-const egoUrl = process.env.EGO_URL;
-const egoClient = process.env.EGO_CLIENT_ID;
-const egoSecret = process.env.EGO_CLIENT_SECRET;
-
 /**
  * Main Function - All work done here
  */
 async function runScript() {
+  const vaultSecrets = await loadVaultSecrets()
+
+  // OPTIONAL: Ego Auth Variables, used to add ego auth to the request.
+  const egoUrl = vaultSecrets.EGO_URL || process.env.EGO_URL;
+  const egoClient = vaultSecrets.EGO_CLIENT_ID || process.env.EGO_CLIENT_ID;
+  const egoSecret = vaultSecrets.EGO_CLIENT_SECRET || process.env.EGO_CLIENT_SECRET;
+
   if (egoUrl && egoClient && egoSecret) {
-    await fetchEgoCredentials();
+    await fetchEgoCredentials(egoUrl, egoClient, egoSecret);
   }
 
   const request = {
@@ -78,7 +122,7 @@ function consoleSectionBreak() {
   console.log(`\n\n=========================`);
 }
 
-async function fetchEgoCredentials() {
+async function fetchEgoCredentials(egoUrl, egoClient, egoSecret) {
   consoleSectionBreak();
   console.log(`FETCHING EGO AUTH AT: ${egoUrl}`);
   const egoAuthUrl = `${egoUrl}/oauth/token?client_id=${egoClient}&client_secret=${egoSecret}&grant_type=client_credentials`;

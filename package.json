@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.25.0",
     "dotenv": "^16.0.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "node-vault": "^0.9.22"
   }
 }
