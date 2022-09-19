@@ -30,9 +30,13 @@ VAULT_URL=https://vault.my-vault-instance.com
 VAULT_ROLE=my-policy-name
 VAULT_SECRETS_PATH=/secrets-dir/path-to-secret/my-secret-name
 ```
-Your Ego credential keys stored in your secret should match those listed in Ego Authorization.
+The secret keys stored in this vault path should match the environment variable names for Ego:
+```
+EGO_CLIENT_ID
+EGO_CLIENT_SECRET
+```
 
-`VAULT_TOKEN` is optional and only used to login to Vault for local testing.
+`VAULT_TOKEN` is optional and only used to login to Vault for local testing. **DO NOT USE IN PRODUCTION. This is available for developers to test a local configuration ONLY.**
 
 ## Configuration
 
