@@ -22,6 +22,18 @@ EGO_CLIENT_ID=my-ego-application
 EGO_CLIENT_SECRET=secretpassword123
 ```
 
+## Vault
+
+Vault can be used to store your Ego credentials in a secure manner. When Vault is enabled, you will need to provide these env variables:
+```
+VAULT_URL=https://vault.my-vault-instance.com
+VAULT_ROLE=my-policy-name
+VAULT_SECRETS_PATH=/secrets-dir/path-to-secret/my-secret-name
+```
+Your Ego credential keys stored in your secret should match those listed in Ego Authorization.
+
+`VAULT_TOKEN` is optional and only used to login to Vault for local testing.
+
 ## Configuration
 
 The properties available to define the web request sent are summarized below. They can be provided through the system environment variables, or through a `.env` file in the same directory as the running script. A `.env.schema` file is provided as an example.
@@ -38,3 +50,8 @@ The properties available to define the web request sent are summarized below. Th
 | EGO_URL           | Optional | No ego auth used                 | URL to Ego API                                                                                                                                                                             |
 | EGO_CLIENT_ID     | Optional | No ego auth used                 | Ego Application Client ID                                                                                                                                                                  |
 | EGO_CLIENT_SECRET | Optional | No ego auth used                 | Ego Application Client Secret                                                                                                                                                              |
+| VAULT_ENABLED     | Optional | Vault not used to store secrets       | Enabled only if value is `true`. Indicates whether Vault is used to store app credentials                                                                                                                                                |
+| VAULT_URL | Required if VAULT_ENABLED=true | Vault not used to store secrets                 | URL for Vault instance being used to store secrets                                                                                                                                                              |
+| VAULT_SECRETS_PATH | Required if VAULT_ENABLED=true | Vault not used to store secrets                 | Path to secret in Vault. Example: `/secrets-dir/path-to-secret/my-secret-name`                                                                                                                                                            |
+| VAULT_ROLE | Required if VAULT_ENABLED=true | Vault not used to store secrets                 | Name of ACL policy in Vault. Example: `my-policy-name`
+| VAULT_TOKEN | Optional | Vault not used to store secrets                 | Token to login to vault instance. For local testing only
