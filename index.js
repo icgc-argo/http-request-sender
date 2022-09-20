@@ -86,7 +86,6 @@ async function fetchEgoCredentials(egoUrl, egoClient, egoSecret) {
 
   console.log(`Fetching EGO authentication details at "${egoUrl}"`);
   const egoAuthUrl = `${egoUrl}/oauth/token?client_id=${egoClient}&client_secret=${egoSecret}&grant_type=client_credentials`;
-  // https://ego.dev.argo.cancercollaboratory.org/api/oauth/token?grant_type=client_credentials&client_id=daco-cron-runner&client_secret=secret
 
   try {
     const response = await axios.post(egoAuthUrl);
