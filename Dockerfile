@@ -42,7 +42,11 @@ USER $APP_USER
 
 COPY --from=builder \
   /usr/index.js \
-  $APP_HOME/index.js 
+  $APP_HOME/index.js
+
+COPY --from=builder \
+  /usr/vault.js \
+  $APP_HOME/vault.js
 
 COPY --from=builder \
     /usr/node_modules/ \
